@@ -6,6 +6,7 @@ path = require 'path'
 program = require 'commander'
 pjson = require "#{__dirname}/../package.json"
 unzip = require 'unzip'
+open = require 'open'
 
 
 dirIsValid = (path) ->
@@ -100,6 +101,24 @@ fontello = ->
                 print 'Install complete.\n'.green
               ))
 
+  program
+    .command('open')
+    .description('open fontello website with config.')
+    .action (env, options) ->
+
+      host = 'http://fontello.com'
+
+      data =
+        config:
+          file: program.config or 'config.json'
+          content_type: 'application/json'
+
+      needle.post host, data, { multipart: true }, (error, response, body) ->
+        throw error if error
+        sessionId = body
+
+        if response.statusCode is 200
+          open("#{host}/#{sessionId}")
 
   program.parse(process.argv)
 
